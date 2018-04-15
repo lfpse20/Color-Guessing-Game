@@ -7,12 +7,12 @@ class RGB{
 
   // returns true if equal
   equals(color){
-    var stringColor = this.getRGB();
+    var stringColor = this.toRGB();
     return stringColor === color;
   }
 
   //return rgb function of colors
-  getRGB(){
+  toRGB(){
     return "rgb(" + this.red +", " + this.green + ", " + this.blue + ")";
   }
 
@@ -41,11 +41,31 @@ initSquares();
 // fill array with random RGB colors Objects
 function fillColorArray(){
   for(var i = 0; i < squares.length; ++i){
-    var red = getRandomInt(max_val);
-    var green = getRandomInt(max_val);
-    var blue = getRandomInt(max_val);
-    colors.push(new RGB(red, green, blue));
+    var newColor;
+
+    do{
+      newColor = createRandomColor();
+    }while(colorExist(newColor));
+
+    colors.push(newColor);
   }
+}
+
+// returns a random color decided with random R,G and B values
+function createRandomColor(){
+  var red = getRandomInt(max_val);
+  var green = getRandomInt(max_val);
+  var blue = getRandomInt(max_val);
+  return new RGB(red, green, blue);
+}
+
+// iterates through current colors and checks if it exist
+function colorExist(newColor){
+  for(var i = 0; i < colors.length; ++i){
+    if(colors[i].equals(newColor.toRGB()))
+      return true;
+  }
+  return false;
 }
 
 // custom function to get range of random numbers [0, max)
@@ -65,12 +85,12 @@ function updateTargetColorText(){
 
 // initializes squares by giving them a color from color array and adding a click listener
 function initSquares(){
-  squares.forEach(function(box, i){
+  squares.forEach(function(square, i){
     // add color to squares
-    box.style.backgroundColor = colors[i].getRGB();
+    square.style.backgroundColor = colors[i].toRGB();
 
     // add click listeners to squares
-    box.addEventListener("click", function(){
+    square.addEventListener("click", function(){
       checkChoice(this.style.backgroundColor, this);
     });
   });
@@ -83,8 +103,8 @@ function checkChoice(colorPicked, currentSquare){
   var correctChoice = targetColor.equals(colorPicked);
   if(correctChoice){
     messageDisplay.textContent = "Correct!";
-    updateAllColors(targetColor.getRGB());
-    h1Header.style.backgroundColor = targetColor.getRGB();
+    updateAllColors(targetColor.toRGB());
+    h1Header.style.backgroundColor = targetColor.toRGB();
   }
   else{
     messageDisplay.textContent = "Try Again";
