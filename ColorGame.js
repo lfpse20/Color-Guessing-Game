@@ -24,6 +24,9 @@ class RGB{
 // main logic
 const max_val = 256;                                             // max value for random color
 const defaultColor = "#232323";                                  // default color equal to background
+const clearText = "";
+const defaultText = "New Colors";
+
 var colors = [];                                                 // holds all randomly created color objects
 var targetColor;                                                 // holds the color object that needs to be guessed
 var h1Header = document.querySelector("#header");                // used to manipulate H1 header background color
@@ -35,12 +38,12 @@ var targetColorDisplay = document.querySelector("#targetColor"); // used to disp
 setStartingState();
 initResetButton();
 
-/* * FUNCTIONS * */
-
+/* * MAIN FUNCTIONS * */
+// readys all elements for a new game
 function setStartingState(){
   fillColorArray();
-  updateTargetColor();
-  updateTargetColorTextView();
+  setTargetColor();
+  setTargetColorTextView();
   initSquares();
 }
 
@@ -48,34 +51,32 @@ function setStartingState(){
 function fillColorArray(){
   for(var i = 0; i < squares.length; ++i){
     var newColor;
-
     do{
       newColor = generateRandomColor();
     }while(colorExist(newColor));
-
     colors.push(newColor);
   }
 }
 
 // updates targetColor object so it can be used for comparison
-function updateTargetColor(){
+function setTargetColor(){
   targetColor = getRandomColor();
 }
 
 // updates target color for user to know what they need to guess
-function updateTargetColorTextView(){
+function setTargetColorTextView(){
   targetColorDisplay.textContent = targetColor.toString();
 }
 
 // initializes squares by giving them a color from color array and adds a click listener
 function initSquares(){
   squares.forEach(function(square, i){
-    // add color to squares
-    square.style.backgroundColor = colors[i].toRGB();
+    setSquareColor(square, getColorAt(i));
 
     // add click listeners to squares
     square.addEventListener("click", function(){
-      checkChoice(this.style.backgroundColor, this);
+      var colorClicked = this.style.backgroundColor;
+      checkChoice(colorClicked, this);
     });
   });
 }
@@ -85,34 +86,35 @@ function initResetButton(){
   resetButton.addEventListener("click", resetGame);
 }
 
-/* * EVENT HANDLING * */
 
+/* * EVENT HANDLING * */
 // called when a square is clicked
-function checkChoice(colorPicked, currentSquare){
-  var correctChoice = targetColor.equals(colorPicked);
-  if(correctChoice){
-    messageDisplay.textContent = "Correct!";
-    updateAllColors(targetColor.toRGB());
-    h1Header.style.backgroundColor = targetColor.toRGB();
+function checkChoice(colorClicked, currentSquare){
+  if(isCorrect(colorClicked)){
+    setMessageDisplay("Correct!");
+    setResetButtonText("Play Again?");
+    setAllSquaresColor(targetColor.toRGB());
+    setHeaderBackgroundColor(targetColor.toRGB());
   }
   else{
-    messageDisplay.textContent = "Try Again";
-    currentSquare.style.backgroundColor = defaultColor;
+    setMessageDisplay("Try Again");
+    setSquareColor(currentSquare, defaultColor);
   }
 }
 
 //sets game to starting state
 function resetGame(){
   resetColorsArray();
-  resetMessageDisplay();
-  resetH1Header();
+  setMessageDisplay(clearText);
+  setHeaderBackgroundColor(defaultColor);
+  setResetButtonText(defaultText);
   setStartingState();
 }
 
-/* * HELPER FUNCTIONS * */
 
+/* * HELPER FUNCTIONS * */
 // updates all color squares with passed color argument
-function updateAllColors(color){
+function setAllSquaresColor(color){
   squares.forEach(function(square){
     square.style.backgroundColor = color;
   });
@@ -150,10 +152,32 @@ function getRandomColor(){
   return colors[getRandomInt(squares.length)];
 }
 
-function resetMessageDisplay(){
-  messageDisplay.textContent = "";
+// sets the color of a square with the passed color argument
+function setSquareColor(square, color){
+  square.style.backgroundColor = color;
 }
 
-function resetH1Header(){
-  h1Header.style.backgroundColor = defaultColor;
+//returns the color stored at index "i" from colors array
+function getColorAt(i){
+  return colors[i].toRGB();
+}
+
+//returns true if the colorClicked is equal to the target color
+function isCorrect(colorClicked){
+  return targetColor.equals(colorClicked);
+}
+
+//sets the text of message element to the passed message argument
+function setMessageDisplay(message){
+  messageDisplay.textContent = message;
+}
+
+//sets the color of H1 header element to the passed color argument
+function setHeaderBackgroundColor(color){
+  h1Header.style.backgroundColor = color;
+}
+
+//sets the text of the reset button to the passed text argument
+function setResetButtonText(text){
+  resetButton.textContent = text;
 }
