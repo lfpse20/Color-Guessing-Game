@@ -22,35 +22,44 @@ class RGB{
 }
 
 // main logic
-const max_val = 256;                                             // max value for random color
-const defaultColor = "#232323";                                  // default color equal to background
-const clearText = "";
-const defaultText = "New Colors";
+const MAX_VAL = 256;                                             // max value for random color
+const DEFAULT_COLOR = "#232323";                                  // default color equal to background
+const CLEAR_TEXT = "";
+const DEFAULT_TEXT = "New Colors";
+const EASY_MODE = 3;
+const HARD_MODE = 6;
 
+var isEasyMode = false;
 var colors = [];                                                 // holds all randomly created color objects
 var targetColor;                                                 // holds the color object that needs to be guessed
 var h1Header = document.querySelector("#header");                // used to manipulate H1 header background color
+var easyBtn = document.querySelector("#easyBtn");
+var hardBtn = document.querySelector("#hardBtn");
 var squares = document.querySelectorAll(".square");              // gets all color squares objects
 var messageDisplay = document.querySelector("#message");         // used for notification
-var resetButton = document.querySelector("#resetButton");        // reset button
+var resetBtn = document.querySelector("#resetBtn");              // reset button
 var targetColorDisplay = document.querySelector("#targetColor"); // used to display what color needs to be guessed
 
-setStartingState();
-initResetButton();
+setStartingState(HARD_MODE);
+initButtons();
 
+/**********************/
 /* * MAIN FUNCTIONS * */
+/**********************/
+
 // readys all elements for a new game
-function setStartingState(){
-  fillColorArray();
+function setStartingState(SquareNum){
+  fillColorArray(SquareNum);
   setTargetColor();
   setTargetColorTextView();
   initSquares();
 }
 
 // fill array with random RGB colors Objects
-function fillColorArray(){
-  for(var i = 0; i < squares.length; ++i){
+function fillColorArray(squareNum){
+  for(var i = 0; i < squareNum; ++i){
     var newColor;
+    // check color has already been generated
     do{
       newColor = generateRandomColor();
     }while(colorExist(newColor));
@@ -63,31 +72,31 @@ function setTargetColor(){
   targetColor = getRandomColor();
 }
 
-// updates target color for user to know what they need to guess
+// updates target color text for user to know what they need to guess
 function setTargetColorTextView(){
   targetColorDisplay.textContent = targetColor.toString();
 }
 
 // initializes squares by giving them a color from color array and adds a click listener
 function initSquares(){
-  squares.forEach(function(square, i){
-    setSquareColor(square, getColorAt(i));
-
-    // add click listeners to squares
-    square.addEventListener("click", function(){
-      var colorClicked = this.style.backgroundColor;
-      checkChoice(colorClicked, this);
-    });
+  colors.forEach(function(color, i){
+    var square = getSquareAt(i);
+    setSquareColor(square, color);
+    addEventListenerTo(square);
   });
 }
 
 // initializes reset button with click listener
-function initResetButton(){
-  resetButton.addEventListener("click", resetGame);
+function initButtons(){
+  resetBtn.addEventListener("click", resetGame);
+  easyBtn.addEventListener("click", easyMode);
+  hardBtn.addEventListener("click", hardMode);
 }
 
-
+/**********************/
 /* * EVENT HANDLING * */
+/**********************/
+
 // called when a square is clicked
 function checkChoice(colorClicked, currentSquare){
   if(isCorrect(colorClicked)){
@@ -98,21 +107,52 @@ function checkChoice(colorClicked, currentSquare){
   }
   else{
     setMessageDisplay("Try Again");
-    setSquareColor(currentSquare, defaultColor);
+    setSquareColor(currentSquare, DEFAULT_COLOR);
   }
 }
 
 //sets game to starting state
 function resetGame(){
   resetColorsArray();
-  setMessageDisplay(clearText);
-  setHeaderBackgroundColor(defaultColor);
-  setResetButtonText(defaultText);
-  setStartingState();
+  setMessageDisplay(CLEAR_TEXT);
+  setHeaderBackgroundColor(DEFAULT_COLOR);
+  setResetButtonText(DEFAULT_TEXT);
+
+  if(isEasyMode){
+    setStartingState(EASY_MODE);
+  }else{
+    setStartingState(HARD_MODE);
+  }  
 }
 
+function easyMode(){
+  isEasyMode = true;
+  hightlightEasy();
+  resetGame();
+  hideBottomSquares();
+}
 
+function hardMode(){
+  isEasyMode = false;
+  highlightHard();
+  resetGame();
+  showBottomSquares();
+}
+
+function hightlightEasy(){
+  easyBtn.classList.add("selected")
+  hardBtn.classList.remove("selected");
+}
+
+function highlightHard(){
+  hardBtn.classList.add("selected");
+  easyBtn.classList.remove("selected");
+}
+
+/************************/
 /* * HELPER FUNCTIONS * */
+/************************/
+
 // updates all color squares with passed color argument
 function setAllSquaresColor(color){
   squares.forEach(function(square){
@@ -127,9 +167,9 @@ function resetColorsArray(){
 
 // returns a random color decided with random R,G and B values
 function generateRandomColor(){
-  var r = getRandomInt(max_val);
-  var g = getRandomInt(max_val);
-  var b = getRandomInt(max_val);
+  var r = getRandomInt(MAX_VAL);
+  var g = getRandomInt(MAX_VAL);
+  var b = getRandomInt(MAX_VAL);
   return new RGB(r, g, b);
 }
 
@@ -149,7 +189,7 @@ function getRandomInt(max){
 
 // returns random color from colors array
 function getRandomColor(){
-  return colors[getRandomInt(squares.length)];
+  return colors[getRandomInt(colors.length)];
 }
 
 // sets the color of a square with the passed color argument
@@ -160,6 +200,17 @@ function setSquareColor(square, color){
 //returns the color stored at index "i" from colors array
 function getColorAt(i){
   return colors[i].toRGB();
+}
+
+function getSquareAt(i){
+  return squares[i];
+}
+
+function addEventListenerTo(square){
+  square.addEventListener("click", function(){
+    var colorClicked = this.style.backgroundColor;
+    checkChoice(colorClicked, this);
+  });
 }
 
 //returns true if the colorClicked is equal to the target color
@@ -179,5 +230,17 @@ function setHeaderBackgroundColor(color){
 
 //sets the text of the reset button to the passed text argument
 function setResetButtonText(text){
-  resetButton.textContent = text;
+  resetBtn.textContent = text;
+}
+
+function hideBottomSquares(){
+  for(var i = 3; i < squares.length; ++i){
+    squares[i].style.display = "none";
+  }
+}
+
+function showBottomSquares(){
+  for(var i = 3; i < squares.length; ++i){
+    squares[i].style.display = "block";
+  }
 }
