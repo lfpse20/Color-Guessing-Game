@@ -8,9 +8,9 @@ h1 {
   color: white;
   text-align: center;
   font-weight: normal;
+  text-transform: uppercase;
   background: steelblue;
   margin: 0;
-  text-transform: uppercase;
   line-height: 1.1;
   padding: 20px 0;
   transition: background .7s;
@@ -30,6 +30,7 @@ button{
   transition: all .3s;
   -webkit-transition:background .7s;
   -moz-transition:background .7s;
+  outline: none;
 }
 
 button:hover{
@@ -53,6 +54,7 @@ button:hover{
 }
 
 #message{
+  font-size: 20px;
   display: inline-block;
   width: 20%;
 }
