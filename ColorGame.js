@@ -22,7 +22,8 @@ class RGB{
 }
 
 // main logic
-const MAX_VAL = 256;                                             // max value for random color
+const MAX_VAL = 256;                                              // max value for random color
+const DEFAULT_BACKGROUND_COLOR = "steelblue";
 const DEFAULT_COLOR = "#232323";                                  // default color equal to background
 const CLEAR_TEXT = "";
 const DEFAULT_TEXT = "New Colors";
@@ -115,14 +116,14 @@ function checkChoice(colorClicked, currentSquare){
 function resetGame(){
   resetColorsArray();
   setMessageDisplay(CLEAR_TEXT);
-  setHeaderBackgroundColor(DEFAULT_COLOR);
+  setHeaderBackgroundColor(DEFAULT_BACKGROUND_COLOR);
   setResetButtonText(DEFAULT_TEXT);
 
   if(isEasyMode){
     setStartingState(EASY_MODE);
   }else{
     setStartingState(HARD_MODE);
-  }  
+  }
 }
 
 function easyMode(){
