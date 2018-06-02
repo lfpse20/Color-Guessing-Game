@@ -119,11 +119,7 @@ function resetGame(){
   setHeaderBackgroundColor(DEFAULT_BACKGROUND_COLOR);
   setResetButtonText(DEFAULT_TEXT);
 
-  if(isEasyMode){
-    setStartingState(EASY_MODE);
-  }else{
-    setStartingState(HARD_MODE);
-  }
+  isEasyMode ? setStartingState(EASY_MODE) : setStartingState(HARD_MODE);
 }
 
 function easyMode(){
